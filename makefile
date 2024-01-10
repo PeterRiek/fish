@@ -1,0 +1,29 @@
+CC = g++
+CFLAGS = -g -I"include"
+LFLAGS = -L"lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+
+SRC_DIR = src
+BUILD_DIR = build
+
+TARGET = fish.exe
+SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ_FILES)
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR)
+
+clean:
+	del /Q /F $(BUILD_DIR)\* $(TARGET)
+	rmdir /Q /S $(BUILD_DIR)
+
+
+run: $(TARGET)
+	./$(TARGET)
