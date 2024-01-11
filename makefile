@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -g -I"include"
-LFLAGS = -L"lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+LFLAGS = -L"lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
 
 SRC_DIR = src
 BUILD_DIR = build

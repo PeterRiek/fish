@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "GameObject.h"
+#include "FishObject.h"
 #include <chrono>
 
 Game::Game() : window(nullptr), renderer(nullptr), isGameRunning(false) {}
@@ -13,7 +14,7 @@ void Game::initialize()
         return;
     }
 
-    window = SDL_CreateWindow("Fish", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Fish", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_SHOWN);
     if (!window)
     {
         SDL_Quit();
@@ -28,14 +29,18 @@ void Game::initialize()
         return;
     }
 
-    renderIntervalMillis = 250;
-    updateIntervalMillis = 1000;
+    renderIntervalMillis = 50;
+    updateIntervalMillis = 100;
     lastRenderTimeMillis = 0;
     lastUpdateTimeMillis = 0;
 
     isGameRunning = true;
 
-    gameObjects.push_back(new GameObject(renderer, "assets/tmp.png", 100, 100, 50, 50));
+    auto sections = new std::vector<std::tuple<int, int, SDL_Color>>;
+    sections->push_back(std::tuple<int, int, SDL_Color>(40, -1, {0xff,0x00,0x00}));
+    sections->push_back(std::tuple<int, int, SDL_Color>(60, +1, {0x00,0xff,0x00}));
+    sections->push_back(std::tuple<int, int, SDL_Color>(100, -1, {0xff,0x00,0x00}));
+    gameObjects.push_back(new FishObject(renderer, "", 100, 100, 20, 20, 2, sections));
 }
 
 long long getCurrentTimeMillis()
@@ -56,8 +61,21 @@ void Game::handleInput()
         }
         if (event.type == SDL_KEYDOWN)
         {
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_SPACE:
+                for (auto &gameObject : gameObjects)
+                {
+                    auto fish = dynamic_cast<FishObject*>(gameObject);
+                    if (fish)
+                        fish->pull(5);
+                }
+                break;
+
+            default:
+                break;
+            }
         }
-        
     }
 }
 
@@ -78,6 +96,7 @@ void Game::render()
         return;
     lastRenderTimeMillis = getCurrentTimeMillis();
 
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
     for (auto &gameObject : gameObjects)
