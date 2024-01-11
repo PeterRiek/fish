@@ -13,7 +13,7 @@ FishObject::FishObject(SDL_Renderer *renderer, const char *imagePath, int x, int
     hook = 0;
     if (TTF_Init() < 0)
         SDL_Quit();
-    font = TTF_OpenFont("sans.ttf", 12);
+    font = TTF_OpenFont("sans.ttf", 128);
 }
 
 FishObject::~FishObject()
@@ -22,8 +22,6 @@ FishObject::~FishObject()
 
 void FishObject::update()
 {
-    GameObject::update();
-
     // printf("%d\n", std::get<0>(sections->back()));
     if (hook > std::get<0>(sections->back()) || hook < 0)
     {
@@ -49,6 +47,10 @@ void FishObject::render()
 {
     SDL_RenderClear(renderer);
 
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xff, 0xff);
+    SDL_Rect bgRect = {0,0,400,400};
+    SDL_RenderFillRect(renderer, &bgRect);
+
     int prev = 0;
     int y = rect.y;
     int x = rect.x;
@@ -65,7 +67,7 @@ void FishObject::render()
     }
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 255);
 
-    SDL_Rect filledRect = {x + w, 100 + hook - 5, 30, 10};
+    SDL_Rect filledRect = {x + w, 100 + hook - 2, 30, 4};
     SDL_RenderFillRect(renderer, &filledRect);
 
     SDL_Rect textRect = {0, 0, 200, 50};
@@ -73,9 +75,11 @@ void FishObject::render()
     std::string progressText = "Progress: " + std::to_string(progress);
     SDL_Surface *textSurface = TTF_RenderText_Solid(font, progressText.c_str(), textColor);
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
 
-    GameObject::render();
+
+
+
+    SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
 }
 
 void FishObject::pull(int pull)

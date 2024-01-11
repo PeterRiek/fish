@@ -29,18 +29,24 @@ void Game::initialize()
         return;
     }
 
-    renderIntervalMillis = 50;
-    updateIntervalMillis = 100;
+    renderIntervalMillis = 30; // 33.3 times / second
+    updateIntervalMillis = 50; // 20 times / second
     lastRenderTimeMillis = 0;
     lastUpdateTimeMillis = 0;
 
     isGameRunning = true;
+    isPulling = false;
+
+    pullStrength = 2;
 
     auto sections = new std::vector<std::tuple<int, int, SDL_Color>>;
-    sections->push_back(std::tuple<int, int, SDL_Color>(40, -1, {0xff,0x00,0x00}));
-    sections->push_back(std::tuple<int, int, SDL_Color>(60, +1, {0x00,0xff,0x00}));
-    sections->push_back(std::tuple<int, int, SDL_Color>(100, -1, {0xff,0x00,0x00}));
-    gameObjects.push_back(new FishObject(renderer, "", 100, 100, 20, 20, 2, sections));
+    sections->push_back(std::tuple<int, int, SDL_Color>(20, -10, {0x60,0x00,0x00}));
+    sections->push_back(std::tuple<int, int, SDL_Color>(45, -1, {0xff,0x00,0x00}));
+    sections->push_back(std::tuple<int, int, SDL_Color>(55, +2, {0x00,0xff,0x00}));
+    sections->push_back(std::tuple<int, int, SDL_Color>(80, -1, {0xff,0x00,0x00}));
+    sections->push_back(std::tuple<int, int, SDL_Color>(100, -10, {0x60,0x00,0x00}));
+    gameObjects.push_back(new FishObject(renderer, "assets/tmp.png", 100, 100, 20, 20, 1, sections));
+    gameObjects.push_back(new GameObject(renderer, "assets/boat.png", 100, 300, 100, 100));
 }
 
 long long getCurrentTimeMillis()
@@ -64,12 +70,19 @@ void Game::handleInput()
             switch (event.key.keysym.sym)
             {
             case SDLK_SPACE:
-                for (auto &gameObject : gameObjects)
-                {
-                    auto fish = dynamic_cast<FishObject*>(gameObject);
-                    if (fish)
-                        fish->pull(5);
-                }
+                isPulling = true;
+                break;
+
+            default:
+                break;
+            }
+        }
+        if (event.type == SDL_KEYUP)
+        {
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_SPACE:
+                isPulling = false;
                 break;
 
             default:
@@ -87,6 +100,9 @@ void Game::update()
     for (auto &gameObject : gameObjects)
     {
         gameObject->update();
+        auto fishObject = dynamic_cast<FishObject*>(gameObject);
+        if (fishObject && isPulling)
+            fishObject->pull(pullStrength);
     }
 }
 
