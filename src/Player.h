@@ -17,6 +17,8 @@ public:
     Rod *getRod();
     std::vector<Fish *> getInventory();
 
+    void setRod(Rod *rod);
+
 private:
     double money;
     Boat *boat;

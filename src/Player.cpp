@@ -1,8 +1,17 @@
 #include "Player.h"
 
-Player::Player() {}
+Player::Player()
+{
+    inventory = std::vector<Fish *>();
+    money = 100;
+}
 
 Player::~Player() {}
+
+void Player::setRod(Rod *rod)
+{
+    this->rod = rod;
+}
 
 double Player::getMoney()
 {

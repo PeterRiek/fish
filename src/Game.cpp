@@ -3,7 +3,7 @@
 #include "FishObject.h"
 #include <chrono>
 
-Game::Game() : window(nullptr), renderer(nullptr), isGameRunning(false) {}
+Game::Game() : window(nullptr), renderer(nullptr), isGameRunning(false), gameScreen(nullptr) {}
 
 Game::~Game() {}
 
@@ -28,25 +28,28 @@ void Game::initialize()
         SDL_Quit();
         return;
     }
+    textureManager = new TextureManager(renderer);
 
     renderIntervalMillis = 30; // 33.3 times / second
     updateIntervalMillis = 50; // 20 times / second
     lastRenderTimeMillis = 0;
     lastUpdateTimeMillis = 0;
 
+
+    gameScreens.push_back(new FishingScreen(this));
+    gameScreens.push_back(new FishCaughtScreen(this));
+
+    Rod *rod = new Rod(nullptr, 100, 1, 2);
+    player = new Player();
+    player->setRod(rod);
+
+    printf("rod_pull=%f", rod->getPull());
+    Fish *fish = new Fish(textureManager->loadTexture("assets/fish.png"), 1, 10.0, 6.0);
+
+
+    setScreen(0, fish);
+
     isGameRunning = true;
-    isPulling = false;
-
-    pullStrength = 2;
-
-    auto sections = new std::vector<std::tuple<int, int, SDL_Color>>;
-    sections->push_back(std::tuple<int, int, SDL_Color>(20, -10, {0x60,0x00,0x00}));
-    sections->push_back(std::tuple<int, int, SDL_Color>(45, -1, {0xff,0x00,0x00}));
-    sections->push_back(std::tuple<int, int, SDL_Color>(55, +2, {0x00,0xff,0x00}));
-    sections->push_back(std::tuple<int, int, SDL_Color>(80, -1, {0xff,0x00,0x00}));
-    sections->push_back(std::tuple<int, int, SDL_Color>(100, -10, {0x60,0x00,0x00}));
-    gameObjects.push_back(new FishObject(renderer, "assets/tmp.png", 100, 100, 20, 20, 1, sections));
-    gameObjects.push_back(new GameObject(renderer, "assets/boat.png", 100, 300, 100, 100));
 }
 
 long long getCurrentTimeMillis()
@@ -61,34 +64,13 @@ void Game::handleInput()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        if (event.type == SDL_QUIT)
+        if (event.type == SDL_QUIT || (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_ESCAPE))
         {
             isGameRunning = false;
+            return;
         }
-        if (event.type == SDL_KEYDOWN)
-        {
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_SPACE:
-                isPulling = true;
-                break;
-
-            default:
-                break;
-            }
-        }
-        if (event.type == SDL_KEYUP)
-        {
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_SPACE:
-                isPulling = false;
-                break;
-
-            default:
-                break;
-            }
-        }
+        if(gameScreen)
+            gameScreen->handleInput(event);
     }
 }
 
@@ -97,13 +79,8 @@ void Game::update()
     if (getCurrentTimeMillis() - lastUpdateTimeMillis < updateIntervalMillis)
         return;
     lastUpdateTimeMillis = getCurrentTimeMillis();
-    for (auto &gameObject : gameObjects)
-    {
-        gameObject->update();
-        auto fishObject = dynamic_cast<FishObject*>(gameObject);
-        if (fishObject && isPulling)
-            fishObject->pull(pullStrength);
-    }
+    if (gameScreen)
+        gameScreen->update();
 }
 
 void Game::render()
@@ -115,21 +92,19 @@ void Game::render()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
-    for (auto &gameObject : gameObjects)
-    {
-        gameObject->render();
-    }
+    if (gameScreen)
+        gameScreen->render(renderer);
 
     SDL_RenderPresent(renderer);
 }
 
 void Game::cleanup()
 {
-    for (auto &gameObject : gameObjects)
-    {
-        delete gameObject;
-    }
-    gameObjects.clear();
+    // for (auto &gameScreen : gameScreens)
+    // {
+    //     delete gameScreen;
+    // }
+    gameScreens.clear();
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -137,7 +112,26 @@ void Game::cleanup()
     SDL_Quit();
 }
 
+void Game::setScreen(size_t screenIdx, void *data)
+{
+    if (screenIdx >= gameScreens.size())
+        return;
+
+    gameScreen = gameScreens[screenIdx];
+    gameScreen->initialize(data);
+}
+
 bool Game::isRunning() const
 {
     return isGameRunning;
+}
+
+TextureManager *Game::getTextureManager()
+{
+    return textureManager;
+}
+
+Player *Game::getPlayer()
+{
+    return player;
 }

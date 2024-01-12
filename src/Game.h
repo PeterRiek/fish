@@ -2,7 +2,14 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
+#include <cstdio>
+#include "Fish.h"
+#include "Boat.h"
+#include "Rod.h"
+#include "Player.h"
 #include "GameScreen.h"
+#include "TextureManager.h"
+
 
 class GameObject;  // Forward declaration
 class GameScreen;
@@ -17,8 +24,10 @@ public:
     void update();
     void render();
     void cleanup();
+    void setScreen(size_t screenIdx, void *data);
     bool isRunning() const;
-    void changeScreen(int screen);
+    TextureManager *getTextureManager();
+    Player *getPlayer();
 
 private:
     SDL_Window *window;
@@ -30,7 +39,7 @@ private:
     long long lastUpdateTimeMillis;
     GameScreen *gameScreen;
     std::vector<GameScreen *> gameScreens;
-    std::vector<GameObject *> gameObjects;
-    bool isPulling;
-    int pullStrength;
+    TextureManager *textureManager;
+
+    Player *player;
 };

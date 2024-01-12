@@ -5,6 +5,7 @@ Rod::Rod(SDL_Texture *texture, double cost, double lure, double pull)
     this->texture = texture;
     this->cost = cost;
     this->lure = lure;
+    this->pull = pull;
 }
 
 Rod::~Rod() {}

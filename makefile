@@ -1,5 +1,6 @@
 CC = g++
-CFLAGS = -g -I"include"
+WFLAGS = -Wall -Wextra
+CFLAGS = -g -I"include" $(WFLAGS)
 LFLAGS = -L"lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
 
 SRC_DIR = src

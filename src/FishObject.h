@@ -4,7 +4,8 @@
 #include <vector>
 #include <tuple>
 
-class FishObject : public GameObject {
+class FishObject : public GameObject
+{
 public:
     FishObject(SDL_Renderer *renderer, const char *imagePath, int x, int y, int width, int height, int strength, std::vector<std::tuple<int, int, SDL_Color>> *sections);
     ~FishObject();
