@@ -3,13 +3,13 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <cstdio>
+#include <SDL2/SDL_ttf.h>
 #include "Fish.h"
 #include "Boat.h"
 #include "Rod.h"
 #include "Player.h"
 #include "GameScreen.h"
 #include "TextureManager.h"
-
 
 class GameObject;  // Forward declaration
 class GameScreen;
@@ -28,6 +28,9 @@ public:
     bool isRunning() const;
     TextureManager *getTextureManager();
     Player *getPlayer();
+    TTF_Font *getTitleFont();
+    TTF_Font *getBodyFont();
+    TTF_Font *getSmallFont();
 
 private:
     SDL_Window *window;
@@ -42,4 +45,8 @@ private:
     TextureManager *textureManager;
 
     Player *player;
+
+    TTF_Font *titleFont;
+    TTF_Font *bodyFont;
+    TTF_Font *smallFont;
 };

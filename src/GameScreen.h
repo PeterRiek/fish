@@ -49,6 +49,11 @@ public:
 
 private:
     Player *player;
+    Fish *fish;
+    bool isPulling;
+    double progress;
+    double hook;
+    std::vector<struct FishingSection> *fishingSections;
 };
 
 class FishCaughtScreen : public GameScreen
@@ -64,4 +69,5 @@ public:
 
 private:
     Player *player;
+    Fish *fish;
 };

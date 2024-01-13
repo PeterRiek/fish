@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "FishObject.h"
 #include <chrono>
+#include <string>
 
 Game::Game() : window(nullptr), renderer(nullptr), isGameRunning(false), gameScreen(nullptr) {}
 
@@ -30,6 +31,13 @@ void Game::initialize()
     }
     textureManager = new TextureManager(renderer);
 
+    if (TTF_Init() < 0)
+        SDL_Quit();
+    titleFont = TTF_OpenFont("sans.ttf", 32);
+    bodyFont = TTF_OpenFont("sans.ttf", 18);
+    smallFont = TTF_OpenFont("sans.ttf", 12);
+
+
     renderIntervalMillis = 30; // 33.3 times / second
     updateIntervalMillis = 50; // 20 times / second
     lastRenderTimeMillis = 0;
@@ -43,8 +51,8 @@ void Game::initialize()
     player = new Player();
     player->setRod(rod);
 
-    printf("rod_pull=%f", rod->getPull());
-    Fish *fish = new Fish(textureManager->loadTexture("assets/fish.png"), 1, 10.0, 6.0);
+    struct Rarity rar = {1, "Uncommon", {0x00,0xff,0x00}};
+    Fish *fish = new Fish(textureManager->loadTexture("assets/fish.png"), rar, 10.0, 6.0);
 
 
     setScreen(0, fish);
@@ -135,3 +143,8 @@ Player *Game::getPlayer()
 {
     return player;
 }
+
+TTF_Font *Game::getTitleFont() { return titleFont; }
+TTF_Font *Game::getBodyFont() { return bodyFont; }
+TTF_Font *Game::getSmallFont() { return smallFont; }
+
