@@ -37,7 +37,7 @@ void LuringScreen::handleInput(SDL_Event event) {}
 
 void LuringScreen::update()
 {
-
+//
 }
 
 void LuringScreen::render(SDL_Renderer *renderer) {}
